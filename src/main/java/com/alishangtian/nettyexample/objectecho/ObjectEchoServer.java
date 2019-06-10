@@ -66,7 +66,6 @@ public final class ObjectEchoServer {
                             new ObjectEchoServerHandler());
                     }
                 });
-
             // Bind and start to accept incoming connections.
             b.bind(PORT).sync().channel().closeFuture().sync();
         } finally {

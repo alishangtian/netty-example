@@ -17,17 +17,19 @@ package com.alishangtian.nettyexample.objectecho;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Handles both client-side and server-side handler depending on which
- * constructor was called.
+ * Handles both client-side and server-side handler depending on which constructor was called.
  */
 public class ObjectEchoServerHandler extends ChannelInboundHandlerAdapter {
+    private static Logger logger = LoggerFactory.getLogger(ObjectEchoClientHandler.class);
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        // Echo back the received object to the client.
-        ctx.write(msg);
+        logger.info("msg from client,address:{},msg:{}", ctx.channel().remoteAddress(), msg);
+        ctx.write("pong");
     }
 
     @Override

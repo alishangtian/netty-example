@@ -16,6 +16,7 @@
 package com.alishangtian.nettyexample.objectecho;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
@@ -64,8 +65,6 @@ public final class ObjectEchoClient {
                             new ObjectEchoClientHandler());
                     }
                 });
-
-            // Start the connection attempt.
             b.connect(HOST, PORT).sync().channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully();

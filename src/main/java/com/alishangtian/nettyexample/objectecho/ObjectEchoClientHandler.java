@@ -15,41 +15,42 @@
  */
 package com.alishangtian.nettyexample.objectecho;
 
+import com.alishangtian.nettyexample.echo.EchoClientHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
- * Handler implementation for the object echo client.  It initiates the
- * ping-pong traffic between the object echo client and server by sending the
- * first message to the server.
+ * Handler implementation for the object echo client.  It initiates the ping-pong traffic between the object echo client
+ * and server by sending the first message to the server.
  */
 public class ObjectEchoClientHandler extends ChannelInboundHandlerAdapter {
-
-    private final List<Integer> firstMessage;
+    private static Logger logger = LoggerFactory.getLogger(ObjectEchoClientHandler.class);
 
     /**
      * Creates a client-side handler.
      */
     public ObjectEchoClientHandler() {
-        firstMessage = new ArrayList<Integer>(ObjectEchoClient.SIZE);
-        for (int i = 0; i < ObjectEchoClient.SIZE; i ++) {
-            firstMessage.add(Integer.valueOf(i));
-        }
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) {
-        // Send the first message if this handler is a client-side handler.
-        ctx.writeAndFlush(firstMessage);
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                ctx.channel().writeAndFlush("ping");
+            }
+        }, 10 * 1000, 10 * 1000);
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        // Echo back the received object to the server.
-        ctx.write(msg);
+        logger.info("msg from server,address:{},msg:{}", ctx.channel().remoteAddress(), msg);
     }
 
     @Override
