@@ -43,7 +43,7 @@ public final class EchoClient {
         final SslContext sslCtx;
         if (SSL) {
             sslCtx = SslContextBuilder.forClient()
-                .trustManager(InsecureTrustManagerFactory.INSTANCE).build();
+                    .trustManager(InsecureTrustManagerFactory.INSTANCE).build();
         } else {
             sslCtx = null;
         }
@@ -53,30 +53,29 @@ public final class EchoClient {
         try {
             Bootstrap b = new Bootstrap();
             b.group(group)
-                .channel(NioSocketChannel.class)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
-                        ChannelPipeline p = ch.pipeline();
-                        if (sslCtx != null) {
-                            p.addLast(sslCtx.newHandler(ch.alloc(), HOST, PORT));
+                    .channel(NioSocketChannel.class)
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        public void initChannel(SocketChannel ch) throws Exception {
+                            ChannelPipeline p = ch.pipeline();
+                            if (sslCtx != null) {
+                                p.addLast(sslCtx.newHandler(ch.alloc(), HOST, PORT));
+                            }
+                            //p.addLast(new LoggingHandler(LogLevel.INFO));
+                            p.addLast(new EchoClientHandler());
                         }
-                        //p.addLast(new LoggingHandler(LogLevel.INFO));
-                        p.addLast(new EchoClientHandler());
-                    }
-                });
+                    });
 
             ChannelFuture f = b.connect(HOST, PORT).sync();
+            new Timer().scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    f.channel().writeAndFlush("ping");
+                }
+            }, 10 * 1000, 10 * 1000);
             f.channel().closeFuture().sync();
-            //new Timer().scheduleAtFixedRate(new TimerTask() {
-            //    @Override
-            //    public void run() {
-            //        f.channel().writeAndFlush("ping");
-            //    }
-            //}, 10 * 1000, 10 * 1000);
         } finally {
-            // Shut down the event loop to terminate all threads.
             group.shutdownGracefully();
         }
     }

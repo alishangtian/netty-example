@@ -30,7 +30,7 @@ public class EchoServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
-        logger.info("msg from client address:{},msg:{}", channelHandlerContext.channel().remoteAddress(), s);
+        System.out.println(String.format("msg from client address:%s,msg:%s", channelHandlerContext.channel().remoteAddress(), s));
         channelHandlerContext.writeAndFlush(s);
     }
 
